@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
             os = new FileOutputStream(databaseFilename);
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
 
@@ -112,14 +112,14 @@ public class MainActivity extends AppCompatActivity {
                     os.flush();
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
         try {
             is.close();
             os.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
     }
