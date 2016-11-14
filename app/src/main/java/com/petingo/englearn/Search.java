@@ -30,7 +30,7 @@ public class Search extends Fragment {
     private EditText searchText;
     private ImageButton clearText;
     private ListView searchResaultList;
-    List<SearchResault> searchResault_list = new ArrayList<SearchResault>();
+    List<SearchResault> searchResault_list = new ArrayList<>();
 
     public String[] Eng = new String[20];
     public String[] Chi = new String[20];
@@ -58,8 +58,12 @@ public class Search extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent showWD = new Intent();
                 showWD.setClass(search_Context, WordDetail.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("Eng",Eng[position]);
+                bundle.putString("Chi",Chi[position]);
+                showWD.putExtras(bundle);
+
                 startActivity(showWD);
-                Toast.makeText(getActivity(), "Click!"+position, Toast.LENGTH_SHORT).show();
         }
         });
         searchText.addTextChangedListener(new TextWatcher() {
@@ -110,6 +114,7 @@ public class Search extends Fragment {
                         cs.moveToNext();
                         counterTotal++;
                     }
+                    cs.close();
                 }
                 else{//中文search
 

@@ -6,27 +6,29 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
 
-/**
- * Created by Petingo on 2016/10/2.
- */
+class MyWordDBhelper extends SQLiteOpenHelper{
+    private static final String DATABASE_NAME="MyWord";
 
-public class MyWordDBhelper extends SQLiteOpenHelper{
-    public static final String DATABASE_NAME="MyWord";
+    private static final int VERSION=1;
 
-    public static final int VERSION=1;
-
-    public MyWordDBhelper(Context context){
+    MyWordDBhelper(Context context){
         super(context, DATABASE_NAME, null,VERSION);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        for(int i=0;i<26;i++){
-            String TABLE_NAME = "NameList";
-            db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                    +_ID +" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-                    + "name CHAR,"
-                    + ")");
-        }
+        db.execSQL("CREATE TABLE NameList ("
+                +_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                "Name CHAR)");
+
+        String TABLE_NAME = "WordList";
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                +_ID +" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                + "Eng CHAR,"
+                + "KK CHAR,"
+                + "Chi CHAR,"
+                + "example CHAR"
+                + "tableID INTEGER"
+                + ")");
     }
 
     @Override
