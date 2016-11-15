@@ -2,26 +2,24 @@ package com.petingo.englearn;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.petingo.englearn.R.layout.add_word;
@@ -86,10 +84,23 @@ public class MyAdapter extends BaseAdapter {
                         }
                     });
                     Spinner spinnerTableName = (Spinner) dialogView.findViewById(R.id.spinnerTableName);
+                    ArrayList<String> TableName = new ArrayList<String>();
+                    TableName.add(String.valueOf(R.string.createNewWordList));
+                    ArrayAdapter<String> TableNameAdapter;
+
                     MyWordDBhelper myWordHelper = new MyWordDBhelper(parent.getContext());
                     SQLiteDatabase myWord = myWordHelper.getReadableDatabase();
                     Cursor cs = myWord.rawQuery("Select * from NameList", null);
+                    cs.moveToFirst();
+                    int NameListCounter = cs.getColumnCount();
+                    for(int i = 0 ; i < NameListCounter ; i++ ){
+                        TableName.add(cs.getString(1));
+                    }
+                    //
                     cs.close();
+
+                    TableNameAdapter = new ArrayAdapter<String>(parent.getContext(), android.R.layout.simple_spinner_item, TableName);
+                    spinnerTableName.setAdapter(TableNameAdapter);
                     dialog.show();
                 }
             });

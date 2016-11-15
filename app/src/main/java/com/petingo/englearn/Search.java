@@ -28,9 +28,9 @@ import java.util.List;
 
 public class Search extends Fragment {
     private EditText searchText;
-    private ImageButton clearText;
     private ListView searchResaultList;
     List<SearchResault> searchResault_list = new ArrayList<>();
+    ImageButton clearText;
 
     public String[] Eng = new String[20];
     public String[] Chi = new String[20];
@@ -90,7 +90,6 @@ public class Search extends Fragment {
                     int up=dbmount,down=0;
                     cs.moveToFirst();
                     while(inputText.compareTo(cs.getString(1))!=0 && (up-down)<=1) {
-                        Log.e("Search",String.valueOf((up)+"*"+String.valueOf(down)));
                         cs.moveToPosition((up+down)/2);
                         if(inputText.compareTo(cs.getString(1))>0){
                             down = (up+down)/2;
@@ -104,10 +103,6 @@ public class Search extends Fragment {
                         if (cs.getString(1).startsWith(inputText)) {
                             Eng[counterResault] = cs.getString(1);
                             Chi[counterResault] = cs.getString(3);
-                            if(Chi[counterResault].length()>20){
-                                char[] tmpChi = Chi[counterResault].toCharArray();
-                                Chi[counterResault] = String.copyValueOf(tmpChi,0,20) + "...";
-                            }
                             searchResault_list.add(new SearchResault(Eng[counterResault],Chi[counterResault]));
                             counterResault++;
                         }
