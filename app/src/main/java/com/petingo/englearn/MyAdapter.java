@@ -2,16 +2,19 @@ package com.petingo.englearn;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
+import android.provider.Telephony;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -19,8 +22,12 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.w3c.dom.NameList;
+
 import java.util.ArrayList;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import static com.petingo.englearn.R.layout.add_word;
 
@@ -57,6 +64,8 @@ public class MyAdapter extends BaseAdapter {
         }
     }
 
+    private int selectedItem = 0;
+
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder holder;
@@ -67,40 +76,65 @@ public class MyAdapter extends BaseAdapter {
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View v) {
+                    MyWordDBhelper myWordHelper = new MyWordDBhelper(parent.getContext());
+                    final SQLiteDatabase myWord = myWordHelper.getWritableDatabase();
                     final AlertDialog.Builder dialog = new AlertDialog.Builder(parent.getContext());
-                    //View dialogView = myInflater.inflate(R.layout.add_word,dialog.);
                     LayoutInflater addWordDialogInflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     View dialogView = addWordDialogInflater.inflate(R.layout.add_word,null);
                     final EditText editText_name = (EditText) dialogView.findViewById(R.id.editText_name);
-                    dialog.setView(add_word)
+                    dialog.setView(dialogView)
                             .setTitle("新增單字")
                             .setPositiveButton("確認",new OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.e("press","OK");
-                                    String a = editText_name.getText().toString();
-
-                                    Log.e("text",a);
+                                    final ContentValues cv = new ContentValues();
+                                    if (selectedItem == 1) {
+                                        String newName = editText_name.getText().toString();
+                                        if (!newName.isEmpty()){
+                                            cv.put("Name",newName);
+                                            myWord.insert("NameList",null,cv);
+                                            cv.clear();
+                                        }
+                                        else{
+                                            Log.e("NO","Name");
+                                        }
+                                    }
+                                    else{
+                                    }
                         }
                     });
                     Spinner spinnerTableName = (Spinner) dialogView.findViewById(R.id.spinnerTableName);
-                    ArrayList<String> TableName = new ArrayList<String>();
-                    TableName.add(String.valueOf(R.string.createNewWordList));
-                    ArrayAdapter<String> TableNameAdapter;
+                    ArrayList<String> TableName = new ArrayList<>();
+                    TableName.add("...新增單字庫");
 
-                    MyWordDBhelper myWordHelper = new MyWordDBhelper(parent.getContext());
-                    SQLiteDatabase myWord = myWordHelper.getReadableDatabase();
                     Cursor cs = myWord.rawQuery("Select * from NameList", null);
+                    int NameListCounter = cs.getCount();
+                    if(NameListCounter == 0){
+                        ContentValues cv = new ContentValues();
+                        cv.put("Name", "預設單字庫");
+                        myWord.insert("NameList", null, cv);
+                    }
                     cs.moveToFirst();
-                    int NameListCounter = cs.getColumnCount();
                     for(int i = 0 ; i < NameListCounter ; i++ ){
                         TableName.add(cs.getString(1));
+                        cs.moveToNext();
                     }
-                    //
+
                     cs.close();
 
-                    TableNameAdapter = new ArrayAdapter<String>(parent.getContext(), android.R.layout.simple_spinner_item, TableName);
+                    ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(parent.getContext(), android.R.layout.simple_spinner_dropdown_item, TableName);
                     spinnerTableName.setAdapter(TableNameAdapter);
+                    spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                            selectedItem = i;
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+
+                        }
+                    });
                     dialog.show();
                 }
             });

@@ -16,7 +16,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_constraintTop_creator="1"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="320dp" />
+        android:layout_width="280dp"
+        style="@style/Widget.AppCompat.Spinner.DropDown"
+        android:dropDownWidth="match_parent" />
 
     <EditText
         android:inputType="textPersonName"
@@ -29,7 +31,7 @@
         tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="8dp"
-        android:layout_width="320dp"
-        android:layout_height="55dp" />
+        android:layout_height="55dp"
+        android:layout_width="280dp" />
 
 </android.support.constraint.ConstraintLayout>
