@@ -28,8 +28,8 @@ import java.util.List;
 
 public class Search extends Fragment {
     private EditText searchText;
-    private ListView searchResaultList;
-    List<SearchResault> searchResault_list = new ArrayList<>();
+    private ListView searchResultList;
+    List<SearchResult> searchResult_list = new ArrayList<>();
     ImageButton clearText;
 
     public String[] Eng = new String[20];
@@ -52,8 +52,8 @@ public class Search extends Fragment {
                     searchText.getText().clear();
                 }
             });
-            searchResaultList = (ListView) view.findViewById(R.id.searchResultList);
-            searchResaultList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            searchResultList = (ListView) view.findViewById(R.id.searchResultList);
+            searchResultList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent showWD = new Intent();
@@ -78,12 +78,12 @@ public class Search extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                searchResault_list.clear();
+                searchResult_list.clear();
                 String inputText = searchText.getText().toString();
                 if (!inputText.isEmpty() && inputText.matches("[a-zA-Z]+")) {
                     char firstChar = inputText.charAt(0);
                     Cursor cs = ecdict.rawQuery("Select * from list_" + Character.toUpperCase(firstChar), null);
-                    int counterResault = 0, counterTotal = 0;
+                    int counterResult = 0, counterTotal = 0;
 
                     int dbmount = cs.getCount();
 
@@ -99,12 +99,12 @@ public class Search extends Fragment {
                         }
                     }
 
-                    while (counterResault < 20 && counterTotal < dbmount) {
+                    while (counterResult < 20 && counterTotal < dbmount) {
                         if (cs.getString(1).startsWith(inputText)) {
-                            Eng[counterResault] = cs.getString(1);
-                            Chi[counterResault] = cs.getString(3);
-                            searchResault_list.add(new SearchResault(Eng[counterResault],Chi[counterResault]));
-                            counterResault++;
+                            Eng[counterResult] = cs.getString(1);
+                            Chi[counterResult] = cs.getString(3);
+                            searchResult_list.add(new SearchResult(Eng[counterResult],Chi[counterResult]));
+                            counterResult++;
                         }
                         cs.moveToNext();
                         counterTotal++;
@@ -114,8 +114,8 @@ public class Search extends Fragment {
                 else{//中文search
 
                 }
-                MyAdapter adapter = new MyAdapter(getActivity(),searchResault_list);
-                searchResaultList.setAdapter(adapter);
+                MyAdapter adapter = new MyAdapter(getActivity(),searchResult_list);
+                searchResultList.setAdapter(adapter);
             }
         });
         //List View -- http://givemepass.blogspot.tw/2011/11/listview.html

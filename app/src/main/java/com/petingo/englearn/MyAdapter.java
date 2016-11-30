@@ -34,25 +34,25 @@ import static com.petingo.englearn.R.layout.add_word;
 /* Created by Petingo on 2016/8/20. */
 public class MyAdapter extends BaseAdapter {
     private LayoutInflater myInflater;
-    private List<SearchResault> searchResaults;
+    private List<SearchResult> searchResults;
     private Context myContext;
-    public MyAdapter(Context c, List<SearchResault> searchResault){
+    public MyAdapter(Context c, List<SearchResult> searchResult){
         myInflater = LayoutInflater.from(c);
         myContext = c;
-        this.searchResaults = searchResault;
+        this.searchResults = searchResult;
     }
     @Override
     public int getCount() {
-        return searchResaults.size();
+        return searchResults.size();
     }
     @Override
     public Object getItem(int arg0) {
-        return searchResaults.get(arg0);
+        return searchResults.get(arg0);
     }
 
     @Override
     public long getItemId(int position) {
-        return searchResaults.indexOf(getItem(position));
+        return searchResults.indexOf(getItem(position));
     }
 
     private class ViewHolder{
@@ -69,6 +69,7 @@ public class MyAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder holder;
+        final SearchResult searchResult = (SearchResult)getItem(position);
         if(convertView==null) {
             convertView = myInflater.inflate(R.layout.search_list_item, null);
             ImageButton addTheWord = (ImageButton) convertView.findViewById(R.id.addTheWord);
@@ -101,18 +102,24 @@ public class MyAdapter extends BaseAdapter {
                                     }
                                     else{
                                     }
-                        }
-                    });
+                                    cv.put("Eng",searchResult.getEng());
+                                    myWord.insert("WordList",null,cv);
+                                    cv.clear();
+                                }
+
+                            });
                     Spinner spinnerTableName = (Spinner) dialogView.findViewById(R.id.spinnerTableName);
                     ArrayList<String> TableName = new ArrayList<>();
-                    TableName.add("...新增單字庫");
+                    TableName.add("-------新增單字庫-------");
 
                     Cursor cs = myWord.rawQuery("Select * from NameList", null);
                     int NameListCounter = cs.getCount();
+                    Log.e("Count",String.valueOf(NameListCounter));
                     if(NameListCounter == 0){
                         ContentValues cv = new ContentValues();
                         cv.put("Name", "預設單字庫");
                         myWord.insert("NameList", null, cv);
+                        NameListCounter = 1;
                     }
                     cs.moveToFirst();
                     for(int i = 0 ; i < NameListCounter ; i++ ){
@@ -139,17 +146,16 @@ public class MyAdapter extends BaseAdapter {
                 }
             });
             holder = new ViewHolder(
-                    (TextView)convertView.findViewById(R.id.resaultEng),
-                    (TextView)convertView.findViewById(R.id.resaultChi)
+                    (TextView)convertView.findViewById(R.id.resultEng),
+                    (TextView)convertView.findViewById(R.id.resultChi)
             );
             convertView.setTag(holder);
         }
         else{
             holder = (ViewHolder) convertView.getTag();
         }
-        SearchResault searchResault = (SearchResault)getItem(position);
-        holder.txtEng.setText(searchResault.getEng());
-        holder.txtChi.setText(searchResault.getChi());
+        holder.txtEng.setText(searchResult.getEng());
+        holder.txtChi.setText(searchResult.getChi());
         return convertView;
     }
 

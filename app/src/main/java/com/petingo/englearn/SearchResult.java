@@ -1,14 +1,12 @@
 package com.petingo.englearn;
 
-import android.widget.TextView;
-
 /**
  * Created by Petingo on 2016/8/20.
  */
-public class SearchResault {
+public class SearchResult {
     private String Eng;
     private String Chi;
-    public SearchResault(String Eng, String Chi){
+    public SearchResult(String Eng, String Chi){
         this.Eng = Eng;
         this.Chi = Chi;
     }
