@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                     return new Search();
                 case 1:
                     //Fragment for Ios Tab
-                    return new VocMemorize();
+                    return new WordMemorize();
                 case 2:
                     //Fragment for Windows Tab
                     return new Search();

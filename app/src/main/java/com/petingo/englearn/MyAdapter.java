@@ -110,7 +110,7 @@ public class MyAdapter extends BaseAdapter {
                             });
                     Spinner spinnerTableName = (Spinner) dialogView.findViewById(R.id.spinnerTableName);
                     ArrayList<String> TableName = new ArrayList<>();
-                    TableName.add("-------新增單字庫-------");
+                    TableName.add("*新增單字庫");
 
                     Cursor cs = myWord.rawQuery("Select * from NameList", null);
                     int NameListCounter = cs.getCount();
@@ -131,6 +131,7 @@ public class MyAdapter extends BaseAdapter {
 
                     ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(parent.getContext(), android.R.layout.simple_spinner_dropdown_item, TableName);
                     spinnerTableName.setAdapter(TableNameAdapter);
+                    spinnerTableName.setSelection(NameListCounter);
                     spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
