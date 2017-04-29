@@ -77,7 +77,7 @@ public class MyAdapter extends BaseAdapter {
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View v) {
-                    MyWordDBhelper myWordHelper = new MyWordDBhelper(parent.getContext());
+                    MyWordDBHelper myWordHelper = new MyWordDBHelper(parent.getContext());
                     final SQLiteDatabase myWord = myWordHelper.getWritableDatabase();
                     final AlertDialog.Builder dialog = new AlertDialog.Builder(parent.getContext());
                     LayoutInflater addWordDialogInflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -18,7 +18,7 @@ public class WordMemorize extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View myView = inflater.inflate(R.layout.word_memorize, container, false);
-        MyWordDBhelper myWordHelper = new MyWordDBhelper(getActivity());
+        MyWordDBHelper myWordHelper = new MyWordDBHelper(getActivity());
         final SQLiteDatabase myWord = myWordHelper.getReadableDatabase();
         Cursor cs = myWord.rawQuery("Select * from NameList", null);
         cs.moveToFirst();

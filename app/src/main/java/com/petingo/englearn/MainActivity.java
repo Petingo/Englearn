@@ -78,51 +78,12 @@ public class MainActivity extends AppCompatActivity {
 
         pref = getSharedPreferences("com.petingo.englearn",MODE_PRIVATE);
         if(pref.getBoolean("firstRun",true)){
-            copyDict();
+            //TODO copyfile
             pref.edit().putBoolean("firstRun", false).apply();
         }
 
     }
 
-    public void copyDict (){
-        String DATABASE_PATH = "/data/data/com.petingo.englearn/databases/";
-        String DATABASE_FILENAME = "ecdict";
-        String databaseFilename = DATABASE_PATH + DATABASE_FILENAME;
-        File dir = new File(DATABASE_PATH);
-
-        if (!dir.exists())
-            dir.mkdir();
-
-        FileOutputStream os = null;
-        try {
-
-            os = new FileOutputStream(databaseFilename);
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
-        }
-
-       InputStream is =getResources().openRawResource(R.raw.ecdict);
-            byte[] buffer = new byte[8192];
-            int count;
-            // 开始复制db文件
-            try {
-                while ((count = is.read(buffer)) > 0) {
-                    os.write(buffer, 0, count);
-                    os.flush();
-                }
-            } catch (IOException e) {
-
-            e.printStackTrace();
-        }
-        try {
-            is.close();
-            os.close();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

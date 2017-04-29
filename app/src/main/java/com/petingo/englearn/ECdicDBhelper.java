@@ -6,13 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
 
-public class ECdicDBhelper extends SQLiteOpenHelper{
+public class ECdicDBHelper extends SQLiteOpenHelper{
 
     public static final String DATABASE_NAME="ecdict";
-
     public static final int VERSION=1;
-
-    public ECdicDBhelper(Context context){
+    public ECdicDBHelper(Context context){
         super(context, DATABASE_NAME, null,VERSION);
 
     }

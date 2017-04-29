@@ -42,7 +42,7 @@ public class Search extends Fragment {
     }
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState){
-        ECdicDBhelper echelper = new ECdicDBhelper(getActivity());
+        ECdicDBHelper echelper = new ECdicDBHelper(getActivity());
         final SQLiteDatabase ecdict = echelper.getReadableDatabase();
         searchText = (EditText) view.findViewById(R.id.searchText);
         clearText = (ImageButton) view.findViewById(R.id.clearText);

@@ -6,12 +6,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
 
-class MyWordDBhelper extends SQLiteOpenHelper{
+class MyWordDBHelper extends SQLiteOpenHelper{
     private static final String DATABASE_NAME="MyWord";
 
     private static final int VERSION=1;
 
-    MyWordDBhelper(Context context){
+    MyWordDBHelper(Context context){
         super(context, DATABASE_NAME, null,VERSION);
     }
     @Override
