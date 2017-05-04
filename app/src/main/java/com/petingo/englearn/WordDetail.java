@@ -55,7 +55,8 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
             public void onClick(View v) {
                 String utteranceId=this.hashCode() + "";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    TTS.speak(Eng, TextToSpeech.QUEUE_FLUSH, null, utteranceId); //TextToSpeech.QUEUE_ADD 為目前的念完才念
+                    TTS.speak(Eng, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+                    //TextToSpeech.QUEUE_ADD 為目前的念完才念
                 }
                 else{
                     TTS.speak(Eng, TextToSpeech.QUEUE_FLUSH, null);

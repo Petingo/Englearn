@@ -85,9 +85,9 @@ public class Search extends Fragment {
                     Cursor cs = ecdict.rawQuery("Select * from list_" + Character.toUpperCase(firstChar), null);
                     int counterResult = 0, counterTotal = 0;
 
-                    int dbmount = cs.getCount();
+                    int dbMount = cs.getCount();
 
-                    int up=dbmount,down=0;
+                    int up=dbMount,down=0;
                     cs.moveToFirst();
                     while(inputText.compareTo(cs.getString(1))!=0 && (up-down)<=1) {
                         cs.moveToPosition((up+down)/2);
@@ -98,8 +98,7 @@ public class Search extends Fragment {
                             up = (up+down)/2;
                         }
                     }
-
-                    while (counterResult < 20 && counterTotal < dbmount) {
+                    while (counterResult < 20 && counterTotal < dbMount) {
                         if (cs.getString(1).startsWith(inputText)) {
                             Eng[counterResult] = cs.getString(1);
                             Chi[counterResult] = cs.getString(3);
@@ -111,7 +110,8 @@ public class Search extends Fragment {
                     }
                     cs.close();
                 }
-                else{//中文search
+                else{
+                    //TODO 中文search
 
                 }
                 MyAdapter adapter = new MyAdapter(getActivity(),searchResult_list);
