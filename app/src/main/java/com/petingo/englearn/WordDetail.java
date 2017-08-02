@@ -8,10 +8,12 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeechService;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -27,12 +29,13 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
-    private int TTS_CHECK_CODE = 9527;
     private TextToSpeech TTS;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_detail);
+        //-----
         TextView tvEng = (TextView) findViewById(R.id.word_detail_Eng);
         TextView tvChi = (TextView) findViewById(R.id.word_detail_Chi);
 
@@ -63,7 +66,7 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
                 }
             }
         });
-
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.word_detail_appbar);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -72,6 +75,7 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         // TODO Auto-generated method stub
+        int TTS_CHECK_CODE = 9527;
         if(requestCode == TTS_CHECK_CODE)
         {
             if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) //如果TTS Engine有成功找到的話

@@ -34,9 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
-
-    public SharedPreferences pref;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
       fragments for each of the sections. We use a
       {@link FragmentPagerAdapter} derivative, which will keep every
       loaded fragment in memory. If this becomes too memory intensive, it
-      may be best to switch to a
+      may ㄕbe best to switch to a
       {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -72,14 +69,8 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        pref = getSharedPreferences("com.petingo.englearn",MODE_PRIVATE);
-        if(pref.getBoolean("firstRun",true)){
-            //TODO sourceDir?
-            util.copyFile(getApplicationInfo().sourceDir, "ecdict", R.raw.ecdict, this);
-            pref.edit().putBoolean("firstRun", false).apply();
-        }
-
+        Util.copyDB(this);
+        checkFirstRun();
     }
 
 
@@ -121,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     return new WordMemorize();
                 case 2:
-                    return new Search();
+                    return new TestFrag();
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
@@ -176,6 +167,16 @@ public class MainActivity extends AppCompatActivity {
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
+        }
+    }
+
+    public void checkFirstRun() {
+        SharedPreferences pref = getSharedPreferences(getPackageName(),MODE_PRIVATE);;
+        if(pref.getBoolean("firstRun",true)){
+            Util.copyDB(this);
+            //Util.copyFile(this.getApplicationInfo().sourceDir, "ecdict", R.raw.ecdict, this);
+            UserDataHelper.newWordListName(this, this.getString(R.string.DefaultDatabase));
+            pref.edit().putBoolean("firstRun", false).apply();
         }
     }
 }

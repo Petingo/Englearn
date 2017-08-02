@@ -21,10 +21,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.NameList;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -81,73 +83,8 @@ class MyAdapter extends BaseAdapter {
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View v) {
-                    MyWordDBHelper myWordHelper = new MyWordDBHelper(parent.getContext());
-                    final SQLiteDatabase myWord = myWordHelper.getWritableDatabase();
-                    final AlertDialog.Builder dialog = new AlertDialog.Builder(parent.getContext());
-                    LayoutInflater addWordDialogInflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    View dialogView = addWordDialogInflater.inflate(R.layout.add_word, null);
-                    final EditText editText_name = (EditText) dialogView.findViewById(R.id.editText_name);
-                    dialog.setView(dialogView)
-                            .setTitle(myContext.getString(R.string.addNewVoc))
-                            .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    final ContentValues cv = new ContentValues();
-                                    if (selectedItem == 1) {
-                                        String newName = editText_name.getText().toString();
-                                        if (!newName.isEmpty()) {
-                                            cv.put("Name", newName);
-                                            myWord.insert("NameList", null, cv);
-                                            cv.clear();
-                                        } else {
-                                            Log.e("NO", "Name");
-                                        }
-                                    } else {
-
-                                    }
-                                    cv.put("Eng", searchResult.getEng());
-                                    myWord.insert("WordList", null, cv);
-                                    cv.clear();
-                                }
-
-                            });
-                    Spinner spinnerTableName = (Spinner) dialogView.findViewById(R.id.spinnerTableName);
-                    ArrayList<String> TableName = new ArrayList<>();
-                    TableName.add(myContext.getString(R.string.selectHereToAddNewList));
-
-                    Cursor cs = myWord.rawQuery("Select * from NameList", null);
-                    int NameListCounter = cs.getCount();
-                    Log.e("Count", String.valueOf(NameListCounter));
-                    //TODO here should move to the "first time setup"
-                    if (NameListCounter == 0) {
-                        ContentValues cv = new ContentValues();
-                        cv.put("Name", myContext.getString(R.string.DefaultDatabase));
-                        myWord.insert("NameList", null, cv);
-                        NameListCounter = 1;
-                    }
-                    cs.moveToFirst();
-                    for (int i = 0; i < NameListCounter; i++) {
-                        TableName.add(cs.getString(1));
-                        cs.moveToNext();
-                    }
-
-                    cs.close();
-
-                    ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(parent.getContext(), android.R.layout.simple_spinner_dropdown_item, TableName);
-                    spinnerTableName.setAdapter(TableNameAdapter);
-                    spinnerTableName.setSelection(NameListCounter);
-                    spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            selectedItem = i;
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-
-                        }
-                    });
-                    dialog.show();
+                    //TODO test if it's need!
+                    showAddWordDialog(parent.getContext());
                 }
             });
             holder = new ViewHolder(
@@ -163,4 +100,60 @@ class MyAdapter extends BaseAdapter {
         return convertView;
     }
 
+    private void showAddWordDialog(final Context context) {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = inflater.inflate(R.layout.add_word, null);
+        dialog.setView(view)
+                .setTitle(myContext.getString(R.string.addNewVoc))
+                .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (selectedItem == 0) {
+                            EditText editName = (EditText) view.findViewById(R.id.editText_name);
+                            String name = editName.getText().toString();
+                            if (!name.isEmpty()) {
+                                UserDataHelper.newWordListName(context, name);
+                            } else {
+                                //TODO name = now
+                                Date date = new Date(System.currentTimeMillis());
+                            }
+                        }
+                        //TODO find which to insert and insert
+//                                    cv.put("Eng", searchResult.getEng());
+//                                    myWord.insert("WordList", null, cv);
+//                                    cv.clear();
+                    }
+
+                });
+        Spinner spinnerTableName = (Spinner) view.findViewById(R.id.spinnerTableName);
+        ArrayList<String> tableName = getAllWordListName();
+        ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, tableName);
+        spinnerTableName.setAdapter(TableNameAdapter);
+//        spinnerTableName.setSelection(NameListCounter);
+        spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedItem = i;
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) { ;}
+        });
+        dialog.show();
+    }
+
+    private ArrayList<String> getAllWordListName(){
+        ArrayList<String> name = new ArrayList<>();
+        name.add(myContext.getString(R.string.selectHereToAddNewList));
+        Cursor cs = UserDataHelper.getReadableDB(myContext).rawQuery("Select * from NameList", null);
+        int NameListCounter = cs.getCount();
+        cs.moveToFirst();
+        for (int i = 0; i < NameListCounter; i++) {
+            name.add(cs.getString(1));
+            cs.moveToNext();
+        }
+        cs.close();
+
+        return name;
+    }
 }

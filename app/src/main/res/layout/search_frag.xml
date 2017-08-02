@@ -1,46 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="fill_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:background="@color/colorSearch">
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        android:paddingEnd="6dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingStart="6dp"
+        android:paddingTop="8dp">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/searchImage"
-            android:src="@android:drawable/ic_menu_search"
-            android:layout_margin="5dp"
-            android:layout_gravity="center" />
-
-        <EditText
-            android:layout_width="270dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/searchText"
-            android:layout_margin="3dp" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/clearText"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:layout_gravity="center"
-            android:background="#00ffffff"
-            android:layout_margin="5dp"
-            android:layout_marginRight="10dp"
-            android:clickable="false"
-            android:focusable="true" />
+        <include
+            layout="@layout/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <ListView
+        android:id="@+id/searchResultList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/searchResultList"
-        android:choiceMode="singleChoice" />
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/white_background"
+        android:choiceMode="singleChoice"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchText"
+        app:layout_constraintVertical_bias="0.0" />
 
 </LinearLayout>
