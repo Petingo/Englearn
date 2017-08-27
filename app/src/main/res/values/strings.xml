@@ -7,7 +7,9 @@
     <string name="createNewWordList">..增加新字庫</string>
     <string name="selectHereToAddNewList">*選此新增單字庫</string>
     <string name="DefaultDatabase">預設單字庫</string>
-    <string name="newSuccess">"新增成功！"</string>>
+    <string name="newSuccess">"新增成功！"</string>
+    <string name="lastSelectedListID"> lastSelectedListID </string>
+    <string name="inputHint">請在此輸入名稱</string>
 
     <string name="search_app_name">SearchView</string>
     <string name="search_behavior" translatable="false">com.lapism.searchview.SearchBehavior</string>

@@ -30,23 +30,24 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
      */
     private GoogleApiClient client;
     private TextToSpeech TTS;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_detail);
-        //-----
-        TextView tvEng = (TextView) findViewById(R.id.word_detail_Eng);
-        TextView tvChi = (TextView) findViewById(R.id.word_detail_Chi);
+
+        TextView textViewEng = (TextView) findViewById(R.id.word_detail_Eng);
+        TextView textViewChi = (TextView) findViewById(R.id.word_detail_Chi);
 
         Bundle bundle = getIntent().getExtras();
         final String Eng = bundle.getString("Eng");
         final String Chi = bundle.getString("Chi");
 
-        tvEng.setText(Eng);
-        tvChi.setText(WordDetailParser.ParserChinese(Chi));
+        textViewEng.setText(Eng);
+        textViewChi.setText(WordDetailParser.ParserChinese(Chi));
 
-        TTS = new TextToSpeech(this,this);
+        TTS = new TextToSpeech(this, this);
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         //startActivityForResult(checkIntent, TTS_CHECK_CODE);
@@ -56,12 +57,11 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
         fab_PlaySound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String utteranceId=this.hashCode() + "";
+                String utteranceId = this.hashCode() + "";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     TTS.speak(Eng, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
                     //TextToSpeech.QUEUE_ADD 為目前的念完才念
-                }
-                else{
+                } else {
                     TTS.speak(Eng, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
@@ -71,29 +71,28 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // TODO Auto-generated method stub
         int TTS_CHECK_CODE = 9527;
-        if(requestCode == TTS_CHECK_CODE)
-        {
-            if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) //如果TTS Engine有成功找到的話
+        if (requestCode == TTS_CHECK_CODE) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) //如果TTS Engine有成功找到的話
             {
                 TTS = new TextToSpeech(this, this);
                 //宣告一個 TextToSpeech instance
                 //並註冊android.speech.tts.TextToSpeech.OnInitListener
                 //當TTS Engine 初始完畢之後會呼叫 onInit(int status)
-                Log.d("onActivityResult" , "onInit");
-            }
-            else //如果TTS Engine 沒有安裝的話 , 要求API安裝
-            {
+                Log.d("onActivityResult", "onInit");
+            } else {
+                //如果TTS Engine 沒有安裝的話 , 要求API安裝
                 Intent installIntent = new Intent();
                 installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
                 startActivity(installIntent);
             }
         }
     }
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.

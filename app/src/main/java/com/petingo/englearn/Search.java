@@ -31,7 +31,7 @@ import java.util.List;
 public class Search extends Fragment {
     private EditText searchText;
     private ListView searchResultList;
-    List<SearchResult> searchResult_list = new ArrayList<>();
+    List<Word> searchResult_list = new ArrayList<>();
     ImageView clearText;
 
     public String[] Eng = new String[20];
@@ -90,14 +90,18 @@ public class Search extends Fragment {
                         if (inputText.compareTo(cs.getString(1)) > 0) {
                             down = (up + down) >> 1;
                         } else {
-                            up = (up + down) / 2;
+                            up = (up + down) >> 1;
                         }
                     }
                     while (counterResult < 20 && counterTotal < dbMount) {
                         if (cs.getString(1).startsWith(inputText)) {
                             Eng[counterResult] = cs.getString(1);
                             Chi[counterResult] = cs.getString(3);
-                            searchResult_list.add(new SearchResult(Eng[counterResult], Chi[counterResult]));
+                            Word tmp = new Word();
+                            tmp.setEng(cs.getString(1));
+                            tmp.setKK(cs.getString(2));
+                            tmp.setChi(cs.getString(3));
+                            searchResult_list.add(tmp);
                             counterResult++;
                         }
                         cs.moveToNext();

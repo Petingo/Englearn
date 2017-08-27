@@ -171,10 +171,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkFirstRun() {
-        SharedPreferences pref = getSharedPreferences(getPackageName(),MODE_PRIVATE);;
+        SharedPreferences pref = getSharedPreferences(getPackageName(),MODE_PRIVATE);
         if(pref.getBoolean("firstRun",true)){
             Util.copyDB(this);
-            //Util.copyFile(this.getApplicationInfo().sourceDir, "ecdict", R.raw.ecdict, this);
             UserDataHelper.newWordListName(this, this.getString(R.string.DefaultDatabase));
             pref.edit().putBoolean("firstRun", false).apply();
         }

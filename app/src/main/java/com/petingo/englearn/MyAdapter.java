@@ -6,8 +6,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.provider.Telephony;
 import android.util.Log;
@@ -31,17 +33,20 @@ import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static android.provider.BaseColumns._ID;
 import static com.petingo.englearn.R.layout.add_word;
 
 /* Created by Petingo on 2016/8/20. */
 class MyAdapter extends BaseAdapter {
     private LayoutInflater myInflater;
-    private List<SearchResult> searchResults;
+    private List<Word> searchResults;
     private Context myContext;
+    SharedPreferences pref;
 
-    MyAdapter(Context c, List<SearchResult> searchResult) {
+    MyAdapter(Context c, List<Word> searchResult) {
         myInflater = LayoutInflater.from(c);
         myContext = c;
+        pref = myContext.getSharedPreferences(myContext.getPackageName(), Context.MODE_PRIVATE);
         this.searchResults = searchResult;
     }
 
@@ -75,7 +80,7 @@ class MyAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder holder;
-        final SearchResult searchResult = (SearchResult) getItem(position);
+        final Word searchResult = (Word) getItem(position);
         if (convertView == null) {
             convertView = myInflater.inflate(R.layout.search_list_item, null);
             ImageButton addTheWord = (ImageButton) convertView.findViewById(R.id.addTheWord);
@@ -102,8 +107,41 @@ class MyAdapter extends BaseAdapter {
 
     private void showAddWordDialog(final Context context) {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-        LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = inflater.inflate(R.layout.add_word, null);
+        final EditText editName = (EditText) view.findViewById(R.id.editText_name);
+        int lastSelectedListID = pref.getInt(myContext.getString(R.string.lastSelectedListID),1);
+        Log.e("lastSelected", String.valueOf(lastSelectedListID));
+        if(lastSelectedListID == 0){
+            editName.setVisibility(View.VISIBLE);
+        } else {
+            editName.setVisibility(View.GONE);
+        }
+        Spinner spinnerTableName = (Spinner) view.findViewById(R.id.spinnerTableName);
+
+        ArrayList<String> tableName = getAllWordListName();
+        ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, tableName);
+        spinnerTableName.setAdapter(TableNameAdapter);
+        spinnerTableName.setSelection(lastSelectedListID);
+        spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.e("select", String.valueOf(i));
+                selectedItem = i;
+                if(i == 0){
+                    editName.setVisibility(View.VISIBLE);
+                } else {
+                    editName.setVisibility(View.GONE);
+                }
+
+                pref.edit().putInt(myContext.getString(R.string.lastSelectedListID), i).apply();
+                Log.e("pref Written", String.valueOf(pref.getInt(myContext.getString(R.string.lastSelectedListID),0)));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
         dialog.setView(view)
                 .setTitle(myContext.getString(R.string.addNewVoc))
                 .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
@@ -113,7 +151,8 @@ class MyAdapter extends BaseAdapter {
                             EditText editName = (EditText) view.findViewById(R.id.editText_name);
                             String name = editName.getText().toString();
                             if (!name.isEmpty()) {
-                                UserDataHelper.newWordListName(context, name);
+                                newWordList(name);
+
                             } else {
                                 //TODO name = now
                                 Date date = new Date(System.currentTimeMillis());
@@ -126,19 +165,6 @@ class MyAdapter extends BaseAdapter {
                     }
 
                 });
-        Spinner spinnerTableName = (Spinner) view.findViewById(R.id.spinnerTableName);
-        ArrayList<String> tableName = getAllWordListName();
-        ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, tableName);
-        spinnerTableName.setAdapter(TableNameAdapter);
-//        spinnerTableName.setSelection(NameListCounter);
-        spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedItem = i;
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) { ;}
-        });
         dialog.show();
     }
 
@@ -156,4 +182,23 @@ class MyAdapter extends BaseAdapter {
 
         return name;
     }
+    private void newWordList(String name){
+        SQLiteDatabase db = UserDataHelper.getWritableDB(myContext);
+        UserDataHelper.newWordListName(myContext, name);
+
+    }
+    private void addWord(Word word, String tableName){
+        SQLiteDatabase db = UserDataHelper.getWritableDB(myContext);
+        ContentValues cv = new ContentValues();
+        cv.put("Eng", word.getEng());
+        cv.put("KK", word.getKK());
+        cv.put("Chi",word.getChi());
+        cv.put("example", word.getExample());
+
+        db.insert(tableName, null, cv);
+        cv.clear();
+        Toast.makeText(myContext, myContext.getString(R.string.newSuccess), Toast.LENGTH_SHORT).show();
+        Log.e("addWord","Success");
+    }
+
 }

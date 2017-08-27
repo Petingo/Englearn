@@ -11,10 +11,9 @@ import static android.provider.BaseColumns._ID;
 
 class UserDataHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "MyWord";
-
     private static final int VERSION = 1;
 
-    private UserDataHelper(Context context) {
+    UserDataHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
 
@@ -24,15 +23,15 @@ class UserDataHelper extends SQLiteOpenHelper {
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                 "Name CHAR)");
 
-        String TABLE_NAME = "WordList";
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+        db.execSQL("CREATE TABLE WordList ("
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
                 + "Eng CHAR,"
                 + "KK CHAR,"
                 + "Chi CHAR,"
-                + "example CHAR"
-                + "tableID INTEGER"
+                + "example CHAR,"
+                + "listID INTEGER"
                 + ")");
+
     }
 
     @Override
@@ -47,6 +46,7 @@ class UserDataHelper extends SQLiteOpenHelper {
         db.insert("NameList", null, cv);
         cv.clear();
         Toast.makeText(context, context.getString(R.string.newSuccess), Toast.LENGTH_SHORT).show();
+        Log.e("newWordListName", "Success");
     }
 
     static SQLiteDatabase getWritableDB(Context context) {

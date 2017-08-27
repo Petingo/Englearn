@@ -8,30 +8,32 @@
     android:weightSum="1">
 
     <Spinner
-        android:layout_height="50dp"
         android:id="@+id/spinnerTableName"
-        tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_constraintTop_creator="1"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="280dp"
         style="@style/Widget.AppCompat.Spinner.DropDown"
-        android:dropDownWidth="match_parent" />
+        android:layout_width="280dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="4dp"
+        android:dropDownWidth="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1" />
 
     <EditText
-        android:inputType="textPersonName"
-        android:ems="10"
         android:id="@+id/editText_name"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
+        android:layout_width="280dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="2dp"
+        android:ems="10"
+        android:hint="@string/inputHint"
+        android:inputType="textPersonName"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerTableName"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_height="55dp"
-        android:layout_width="280dp" />
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1" />
 
 </android.support.constraint.ConstraintLayout>
