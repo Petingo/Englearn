@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pref = getSharedPreferences(getPackageName(),MODE_PRIVATE);
         if(pref.getBoolean("firstRun",true)){
             Util.copyDB(this);
-            UserDataHelper.newWordListName(this, this.getString(R.string.DefaultDatabase));
+            UserDataHelper.newWordListName(this, this.getString(R.string.defaultDatabase));
             pref.edit().putBoolean("firstRun", false).apply();
         }
     }

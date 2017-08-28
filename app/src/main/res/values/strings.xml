@@ -6,8 +6,9 @@
     <string name="confirm">確定</string>
     <string name="createNewWordList">..增加新字庫</string>
     <string name="selectHereToAddNewList">*選此新增單字庫</string>
-    <string name="DefaultDatabase">預設單字庫</string>
+    <string name="defaultDatabase">預設單字庫</string>
     <string name="newSuccess">"新增成功！"</string>
+    <string name="lastSelectedListSpinnerID"> lastSelectedListSpinnerID </string>
     <string name="lastSelectedListID"> lastSelectedListID </string>
     <string name="inputHint">請在此輸入名稱</string>
 

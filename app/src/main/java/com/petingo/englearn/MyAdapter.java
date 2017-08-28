@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import org.w3c.dom.NameList;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.IllegalFormatCodePointException;
@@ -41,6 +42,7 @@ class MyAdapter extends BaseAdapter {
     private LayoutInflater myInflater;
     private List<Word> searchResults;
     private Context myContext;
+    private int selectedItem = 0;
     SharedPreferences pref;
 
     MyAdapter(Context c, List<Word> searchResult) {
@@ -75,8 +77,6 @@ class MyAdapter extends BaseAdapter {
         }
     }
 
-    private int selectedItem = 0;
-
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder holder;
@@ -88,8 +88,7 @@ class MyAdapter extends BaseAdapter {
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View v) {
-                    //TODO test if it's need!
-                    showAddWordDialog(parent.getContext());
+                    showAddWordDialog(parent.getContext(), position);
                 }
             });
             holder = new ViewHolder(
@@ -105,37 +104,43 @@ class MyAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void showAddWordDialog(final Context context) {
+
+    private void showAddWordDialog(final Context context, int position) {
+
         final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         final LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = inflater.inflate(R.layout.add_word, null);
         final EditText editName = (EditText) view.findViewById(R.id.editText_name);
-        int lastSelectedListID = pref.getInt(myContext.getString(R.string.lastSelectedListID),1);
-        Log.e("lastSelected", String.valueOf(lastSelectedListID));
-        if(lastSelectedListID == 0){
+        int lastSelectedListSpinnerID = pref.getInt(myContext.getString(R.string.lastSelectedListSpinnerID),1);
+        String listName = context.getString(R.string.defaultDatabase);
+
+        //Only when selection = 0 need to add a new word list, so set it GONE for others.
+        if(lastSelectedListSpinnerID == 0){
             editName.setVisibility(View.VISIBLE);
         } else {
             editName.setVisibility(View.GONE);
         }
-        Spinner spinnerTableName = (Spinner) view.findViewById(R.id.spinnerTableName);
+        final Spinner spinnerTableName = (Spinner) view.findViewById(R.id.spinnerTableName);
 
         ArrayList<String> tableName = getAllWordListName();
         ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, tableName);
         spinnerTableName.setAdapter(TableNameAdapter);
-        spinnerTableName.setSelection(lastSelectedListID);
+        spinnerTableName.setSelection(lastSelectedListSpinnerID);
         spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.e("select", String.valueOf(i));
-                selectedItem = i;
+                lastSelectedListSpinnerID = i;
+                listName = (String) spinnerTableName.getSelectedItem();
                 if(i == 0){
                     editName.setVisibility(View.VISIBLE);
                 } else {
                     editName.setVisibility(View.GONE);
                 }
 
-                pref.edit().putInt(myContext.getString(R.string.lastSelectedListID), i).apply();
-                Log.e("pref Written", String.valueOf(pref.getInt(myContext.getString(R.string.lastSelectedListID),0)));
+                pref.edit().putInt(myContext.getString(R.string.lastSelectedListSpinnerID), i).apply();
+
+                Log.e("pref Written", String.valueOf(pref.getInt(myContext.getString(R.string.lastSelectedListSpinnerID),0)));
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -147,7 +152,7 @@ class MyAdapter extends BaseAdapter {
                 .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (selectedItem == 0) {
+                        if (lastSelectedListSpinnerID == 0) {
                             EditText editName = (EditText) view.findViewById(R.id.editText_name);
                             String name = editName.getText().toString();
                             if (!name.isEmpty()) {
@@ -155,10 +160,15 @@ class MyAdapter extends BaseAdapter {
 
                             } else {
                                 //TODO name = now
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd hh:mm");
                                 Date date = new Date(System.currentTimeMillis());
+                                String sDate = dateFormat.format(date);
+                                Log.e("date", sDate);
+                                newWordList(sDate);
                             }
                         }
                         //TODO find which to insert and insert
+
 //                                    cv.put("Eng", searchResult.getEng());
 //                                    myWord.insert("WordList", null, cv);
 //                                    cv.clear();
