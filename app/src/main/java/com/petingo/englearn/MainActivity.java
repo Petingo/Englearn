@@ -39,22 +39,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        /*
-      The {@link android.support.v4.view.PagerAdapter} that will provide
-      fragments for each of the sections. We use a
-      {@link FragmentPagerAdapter} derivative, which will keep every
-      loaded fragment in memory. If this becomes too memory intensive, it
-      may ㄕbe best to switch to a
-      {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+        Util.copyDB(this);
+        checkFirstRun();
+
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
-        /*
-      The {@link ViewPager} that will host the section contents.
-     */
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -69,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        Util.copyDB(this);
-        checkFirstRun();
+
     }
 
 
@@ -83,12 +71,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -124,14 +108,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            //Title
             switch (position) {
                 case 0:
                     return "搜尋字典";
                 case 1:
                     return "背單字";
                 case 2:
-                    return "單字測驗";
+                    return "設定";
             }
             return null;
         }
@@ -139,16 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
     //A placeholder fragment containing a simple view.
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
@@ -172,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void checkFirstRun() {
         SharedPreferences pref = getSharedPreferences(getPackageName(),MODE_PRIVATE);
-        if(pref.getBoolean("firstRun",true)){
+        if(pref.getBoolean("firstRun", true)){
             Util.copyDB(this);
             UserDataHelper.newWordListName(this, this.getString(R.string.defaultDatabase));
             pref.edit().putBoolean("firstRun", false).apply();

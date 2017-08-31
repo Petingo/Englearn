@@ -29,7 +29,7 @@ class UserDataHelper extends SQLiteOpenHelper {
                 + "KK CHAR,"
                 + "Chi CHAR,"
                 + "example CHAR,"
-                + "listID INTEGER"
+                + "listName CHAR"
                 + ")");
 
     }

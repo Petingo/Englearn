@@ -1,5 +1,6 @@
 package com.petingo.englearn;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -42,14 +44,16 @@ class MyAdapter extends BaseAdapter {
     private LayoutInflater myInflater;
     private List<Word> searchResults;
     private Context myContext;
-    private int selectedItem = 0;
-    SharedPreferences pref;
+    private ArrayList<String> name = new ArrayList<>();
+    private SharedPreferences pref;
+    private ArrayList<String> tableName;
 
     MyAdapter(Context c, List<Word> searchResult) {
         myInflater = LayoutInflater.from(c);
         myContext = c;
         pref = myContext.getSharedPreferences(myContext.getPackageName(), Context.MODE_PRIVATE);
         this.searchResults = searchResult;
+        tableName = getAllWordListName();
     }
 
     @Override
@@ -105,82 +109,79 @@ class MyAdapter extends BaseAdapter {
     }
 
 
-    private void showAddWordDialog(final Context context, int position) {
-
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+    private void showAddWordDialog(final Context context, final int position) {
         final LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View view = inflater.inflate(R.layout.add_word, null);
-        final EditText editName = (EditText) view.findViewById(R.id.editText_name);
-        int lastSelectedListSpinnerID = pref.getInt(myContext.getString(R.string.lastSelectedListSpinnerID),1);
-        String listName = context.getString(R.string.defaultDatabase);
+        final View addWordDialogView = inflater.inflate(R.layout.add_word, null);
 
-        //Only when selection = 0 need to add a new word list, so set it GONE for others.
-        if(lastSelectedListSpinnerID == 0){
-            editName.setVisibility(View.VISIBLE);
-        } else {
-            editName.setVisibility(View.GONE);
-        }
-        final Spinner spinnerTableName = (Spinner) view.findViewById(R.id.spinnerTableName);
-
-        ArrayList<String> tableName = getAllWordListName();
+        final Spinner spinnerTableName = (Spinner) addWordDialogView.findViewById(R.id.spinnerTableName);
+        final int[] lastSelectedListSpinnerID = {pref.getInt(myContext.getString(R.string.lastSelectedListSpinnerID), 0)};
         ArrayAdapter<String> TableNameAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, tableName);
         spinnerTableName.setAdapter(TableNameAdapter);
-        spinnerTableName.setSelection(lastSelectedListSpinnerID);
+        spinnerTableName.setSelection(lastSelectedListSpinnerID[0]);
         spinnerTableName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.e("select", String.valueOf(i));
-                lastSelectedListSpinnerID = i;
-                listName = (String) spinnerTableName.getSelectedItem();
-                if(i == 0){
-                    editName.setVisibility(View.VISIBLE);
-                } else {
-                    editName.setVisibility(View.GONE);
-                }
-
+                lastSelectedListSpinnerID[0] = i;
                 pref.edit().putInt(myContext.getString(R.string.lastSelectedListSpinnerID), i).apply();
 
-                Log.e("pref Written", String.valueOf(pref.getInt(myContext.getString(R.string.lastSelectedListSpinnerID),0)));
+                Log.e("pref Written", String.valueOf(pref.getInt(myContext.getString(R.string.lastSelectedListSpinnerID), 0)));
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
 
+        final Button newWordList = (Button) addWordDialogView.findViewById(R.id.newWordList);
+        newWordList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final View newWordListView = inflater.inflate(R.layout.new_word_list, null);
+                newWordListDialog(newWordListView).show();
+            }
+        });
+
+        addWordDialog(addWordDialogView, position, spinnerTableName).show();
+    }
+
+    private AlertDialog.Builder newWordListDialog(final View view){
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(myContext);
+        dialog.setView(view)
+                .setTitle(myContext.getString(R.string.newWordList))
+                .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText wordListName = (EditText) view.findViewById(R.id.newWordListName);
+                        String newName = wordListName.getText().toString();
+                        if (newName.isEmpty()) {
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd hh:mm:ss");
+                            Date date = new Date(System.currentTimeMillis());
+                            newName = dateFormat.format(date);
+                        }
+                        newWordList(newName);
+                        tableName.add(newName);
+                        Log.e("New Name", wordListName.getText().toString());
+                    }
+                });
+        return dialog;
+    }
+    private AlertDialog.Builder addWordDialog(View view, final int position, final Spinner spinnerTableName) {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(myContext);
         dialog.setView(view)
                 .setTitle(myContext.getString(R.string.addNewVoc))
                 .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (lastSelectedListSpinnerID == 0) {
-                            EditText editName = (EditText) view.findViewById(R.id.editText_name);
-                            String name = editName.getText().toString();
-                            if (!name.isEmpty()) {
-                                newWordList(name);
-
-                            } else {
-                                //TODO name = now
-                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd hh:mm");
-                                Date date = new Date(System.currentTimeMillis());
-                                String sDate = dateFormat.format(date);
-                                Log.e("date", sDate);
-                                newWordList(sDate);
-                            }
-                        }
-                        //TODO find which to insert and insert
-
-//                                    cv.put("Eng", searchResult.getEng());
-//                                    myWord.insert("WordList", null, cv);
-//                                    cv.clear();
+                        addWord((Word) getItem(position), (String) spinnerTableName.getSelectedItem());
+                        Log.e("Eng", ((Word) getItem(position)).getEng());
+                        Log.e("Tab", (String) spinnerTableName.getSelectedItem());
                     }
-
                 });
-        dialog.show();
+        return dialog;
     }
 
-    private ArrayList<String> getAllWordListName(){
-        ArrayList<String> name = new ArrayList<>();
-        name.add(myContext.getString(R.string.selectHereToAddNewList));
+    private ArrayList<String> getAllWordListName() {
         Cursor cs = UserDataHelper.getReadableDB(myContext).rawQuery("Select * from NameList", null);
         int NameListCounter = cs.getCount();
         cs.moveToFirst();
@@ -192,23 +193,25 @@ class MyAdapter extends BaseAdapter {
 
         return name;
     }
-    private void newWordList(String name){
+
+    private void newWordList(String name) {
         SQLiteDatabase db = UserDataHelper.getWritableDB(myContext);
         UserDataHelper.newWordListName(myContext, name);
-
     }
-    private void addWord(Word word, String tableName){
+
+    private void addWord(Word word, String selectedListName) {
         SQLiteDatabase db = UserDataHelper.getWritableDB(myContext);
         ContentValues cv = new ContentValues();
         cv.put("Eng", word.getEng());
         cv.put("KK", word.getKK());
-        cv.put("Chi",word.getChi());
+        cv.put("Chi", word.getChi());
         cv.put("example", word.getExample());
+        cv.put("listName", selectedListName);
 
-        db.insert(tableName, null, cv);
+        db.insert("WordList", null, cv);
         cv.clear();
         Toast.makeText(myContext, myContext.getString(R.string.newSuccess), Toast.LENGTH_SHORT).show();
-        Log.e("addWord","Success");
+        Log.e("addWord", "Success");
     }
 
 }
