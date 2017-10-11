@@ -4,6 +4,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="addNewVoc">新增單字</string>
     <string name="confirm">確定</string>
+    <string name="cancel">取消</string>
     <string name="createNewWordList">..增加新字庫</string>
     <string name="addNewWordList">新增</string>
     <string name="newWordList">新增單字庫</string>
@@ -12,6 +13,11 @@
     <string name="lastSelectedListSpinnerID"> lastSelectedListSpinnerID </string>
     <string name="lastSelectedListID"> lastSelectedListID </string>
     <string name="inputHint">請在此輸入名稱</string>
+    <string name="empty">單字庫是空的！</string>
+    <string name="showTranslation">顯示翻譯</string>
+    <string name="next">下一個</string>
+    <string name="again">重新開始</string>
+    <string name="exit">結束</string>
 
 
     <string name="search_app_name">SearchView</string>

@@ -1,35 +1,28 @@
 package com.petingo.englearn;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeechService;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.util.Pair;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
 
-import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
 /* Created by Petingo on 2016/8/29. */
-public class WordDetail extends Activity implements TextToSpeech.OnInitListener {
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
-    private TextToSpeech TTS;
+public class WordDetail extends com.petingo.englearn.MyTextToSpeech {
+    private List<Pair<String, String>> detail = new ArrayList<>();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -37,15 +30,35 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_detail);
 
-        TextView textViewEng = (TextView) findViewById(R.id.word_detail_Eng);
-        TextView textViewChi = (TextView) findViewById(R.id.word_detail_Chi);
+        final String word = Search.selectedWord.getWord();
+        final String translation = Search.selectedWord.getTranslation();
+        final String exchange = Search.selectedWord.getExchange();
 
-        Bundle bundle = getIntent().getExtras();
-        final String Eng = bundle.getString("Eng");
-        final String Chi = bundle.getString("Chi");
+        String phonetic = Search.selectedWord.getPhonetic();
+        String example = Search.selectedWord.getExample();
 
-        textViewEng.setText(Eng);
-        textViewChi.setText(WordDetailParser.ParserChinese(Chi));
+        if (Util.notNullOrEmpty(phonetic)){
+            Log.e("phonetic",phonetic);
+            phonetic = "[" + phonetic + "]";
+        }
+
+        TextView txtWord = (TextView) findViewById(R.id.word_detail_word);
+        TextView txtKK = (TextView) findViewById(R.id.word_detail_kk);
+
+        txtWord.setText(word);
+        txtKK.setText(phonetic);
+
+        detailParser(translation);
+        exampleParser(example);
+        exchangeParser(exchange);
+
+        WordDetailAdapter WordDetailAdapter = new WordDetailAdapter(detail);
+        RecyclerView mList = (RecyclerView) findViewById(R.id.word_detail_list_view);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mList.setLayoutManager(layoutManager);
+        mList.setAdapter(WordDetailAdapter);
 
         TTS = new TextToSpeech(this, this);
         Intent checkIntent = new Intent();
@@ -59,92 +72,90 @@ public class WordDetail extends Activity implements TextToSpeech.OnInitListener 
             public void onClick(View v) {
                 String utteranceId = this.hashCode() + "";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    TTS.speak(Eng, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
-                    //TextToSpeech.QUEUE_ADD 為目前的念完才念
+                    TTS.speak(word, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
                 } else {
-                    TTS.speak(Eng, TextToSpeech.QUEUE_FLUSH, null);
+                    TTS.speak(word, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         });
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.word_detail_appbar);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
-        int TTS_CHECK_CODE = 9527;
-        if (requestCode == TTS_CHECK_CODE) {
-            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) //如果TTS Engine有成功找到的話
-            {
-                TTS = new TextToSpeech(this, this);
-                //宣告一個 TextToSpeech instance
-                //並註冊android.speech.tts.TextToSpeech.OnInitListener
-                //當TTS Engine 初始完畢之後會呼叫 onInit(int status)
-                Log.d("onActivityResult", "onInit");
-            } else {
-                //如果TTS Engine 沒有安裝的話 , 要求API安裝
-                Intent installIntent = new Intent();
-                installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivity(installIntent);
+    private void exampleParser(String example){
+        if (Util.notNullOrEmpty(example)) {
+            example = example.replace("*", "\n");
+            detail.add(Pair.create("例句", example));
+        }
+    }
+
+    private void detailParser(String resource) {
+        resource = resource.replace("a.", "adj.");
+        resource = resource.replace("ad.", "adv.");
+
+        resource = resource.replace("n.", "名詞:");
+        resource = resource.replace("adj.", "形容詞:");
+        resource = resource.replace("adv.", "副詞:");
+        resource = resource.replace("vt.", "及物動詞:");
+        resource = resource.replace("vi.", "不及物動詞:");
+        resource = resource.replace("v.", "動詞:");
+        resource = resource.replace("vbl.", "動詞變化:");
+        resource = resource.replace("int.", "感嘆詞:");
+        resource = resource.replace("prep.", "介繫詞:");
+        resource = resource.replace("abbr.", "縮寫:");
+        resource = resource.replace("conj.", "連接詞:");
+        resource = resource.replace("art.", "冠詞:");
+        resource = resource.replace("pron.", "代名詞:");
+        resource = resource.replace("pl.", "複數:");
+        resource = resource.replace("num.", "數量詞:");
+
+        resource = resource.replace(",", "，");
+        resource = resource.replace("\\n","---");
+        String[] trans = resource.split("---");
+
+        for (String t : trans) {
+            if (!t.isEmpty()) {
+                String[] tmp;
+                if(t.contains(":")){
+                    tmp = t.split(":");
+                    detail.add(Pair.create(tmp[0], tmp[1]));
+                } else {
+                    detail.add(Pair.create("釋意", t));
+                }
             }
         }
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("WordDetail Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
+    private void exchangeParser(String exchange){
+        if(Util.notNullOrEmpty(exchange)){
+            exchange = exchange.replace("p:","過去式：");
+            exchange = exchange.replace("d:","過去分詞：");
+            exchange = exchange.replace("i:","現在分詞：");
+            exchange = exchange.replace("3:","第三人稱：");
+            exchange = exchange.replace("r:","比較級：");
+            exchange = exchange.replace("t:","最高級：");
+            exchange = exchange.replace("s:","複數形式：");
+            exchange = exchange.replace("0:","原形：");
 
-    @Override
-    public void onStart() {
-        super.onStart();
+            String output = "";
+            if (exchange.contains("/")) {
+                String ex[] = exchange.split("/");
+                String nextLine = "";
+                for (String t : ex){
+                    if(t.startsWith("1")){
+                        continue;
+                    }
+                    output += nextLine;
+                    output += t;
+                    nextLine = "\n";
+                }
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
-    }
-
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            //設定語言為英文
-            int result = TTS.setLanguage(Locale.US);
-            //如果該語言資料不見了或沒有支援則無法使用
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS", "This Language is not supported");
             } else {
-                //語調(1為正常語調；0.5比正常語調低一倍；2比正常語調高一倍)
-                TTS.setPitch(1);
-                //速度(1為正常速度；0.5比正常速度慢一倍；2比正常速度快一倍)
-                TTS.setSpeechRate((float) 1);
+                output = exchange;
             }
-        } else {
-            Log.e("TTS", "Initilization Failed!");
+
+            detail.add(Pair.create("詞態變化" ,output));
+
         }
     }
 }

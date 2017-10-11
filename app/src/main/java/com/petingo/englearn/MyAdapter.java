@@ -72,12 +72,12 @@ class MyAdapter extends BaseAdapter {
     }
 
     private class ViewHolder {
-        TextView txtEng;
-        TextView txtChi;
+        TextView txtWord;
+        TextView txtTrans;
 
-        ViewHolder(TextView txtEng, TextView txtChi) {
-            this.txtEng = txtEng;
-            this.txtChi = txtChi;
+        ViewHolder(TextView txtWord, TextView txtTrans) {
+            this.txtWord = txtWord;
+            this.txtTrans = txtTrans;
         }
     }
 
@@ -96,15 +96,15 @@ class MyAdapter extends BaseAdapter {
                 }
             });
             holder = new ViewHolder(
-                    (TextView) convertView.findViewById(R.id.resultEng),
-                    (TextView) convertView.findViewById(R.id.resultChi)
+                    (TextView) convertView.findViewById(R.id.resultWord),
+                    (TextView) convertView.findViewById(R.id.resultTrans)
             );
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.txtEng.setText(searchResult.getEng());
-        holder.txtChi.setText(searchResult.getChi());
+        holder.txtWord.setText(searchResult.getWord());
+        holder.txtTrans.setText(searchResult.getTranslation().replace("\\n","；"));
         return convertView;
     }
 
@@ -149,6 +149,7 @@ class MyAdapter extends BaseAdapter {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(myContext);
         dialog.setView(view)
                 .setTitle(myContext.getString(R.string.newWordList))
+                .setNegativeButton(myContext.getString(R.string.cancel), null)
                 .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -170,12 +171,11 @@ class MyAdapter extends BaseAdapter {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(myContext);
         dialog.setView(view)
                 .setTitle(myContext.getString(R.string.addNewVoc))
+                .setNegativeButton(myContext.getString(R.string.cancel), null)
                 .setPositiveButton(myContext.getString((R.string.confirm)), new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         addWord((Word) getItem(position), (String) spinnerTableName.getSelectedItem());
-                        Log.e("Eng", ((Word) getItem(position)).getEng());
-                        Log.e("Tab", (String) spinnerTableName.getSelectedItem());
                     }
                 });
         return dialog;
@@ -202,9 +202,7 @@ class MyAdapter extends BaseAdapter {
     private void addWord(Word word, String selectedListName) {
         SQLiteDatabase db = UserDataHelper.getWritableDB(myContext);
         ContentValues cv = new ContentValues();
-        cv.put("Eng", word.getEng());
-        cv.put("KK", word.getKK());
-        cv.put("Chi", word.getChi());
+        //TODO complete addWord
         cv.put("example", word.getExample());
         cv.put("listName", selectedListName);
 

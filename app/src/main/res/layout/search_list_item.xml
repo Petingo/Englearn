@@ -10,7 +10,7 @@
 
 
     <TextView
-        android:id="@+id/resultEng"
+        android:id="@+id/resultWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -32,12 +32,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/resultChi"
+        android:id="@+id/resultTrans"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/resultEng"
+        android:layout_below="@+id/resultWord"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="16dp"
@@ -52,16 +52,16 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/addTheWord"
-        app:layout_constraintTop_toBottomOf="@+id/resultEng" />
+        app:layout_constraintTop_toBottomOf="@+id/resultWord" />
 
     <ImageButton
         android:id="@+id/addTheWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/resultChi"
+        android:layout_alignBottom="@+id/resultTrans"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/resultEng"
+        android:layout_alignTop="@+id/resultWord"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"

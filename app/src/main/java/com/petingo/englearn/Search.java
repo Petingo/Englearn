@@ -30,12 +30,11 @@ import java.util.List;
 
 public class Search extends Fragment {
     private EditText searchText;
-    private ListView searchResultList;
-    List<Word> searchResult_list = new ArrayList<>();
-    ImageView clearText;
+    private SQLiteDatabase ecDict;
 
-    public String[] Eng = new String[20];
-    public String[] Chi = new String[20];
+    List<Word> searchResultList = new ArrayList<>();
+    public static Word selectedWord;
+    ImageView clearText;
     Context search_Context;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,8 +45,8 @@ public class Search extends Fragment {
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        DictHelper echelper = new DictHelper(getActivity());
-        final SQLiteDatabase ecdict = echelper.getReadableDatabase();
+        DictHelper ecHelper = new DictHelper(getActivity());
+        ecDict = ecHelper.getReadableDatabase();
         searchText = (EditText) view.findViewById(R.id.searchText);
         clearText = (ImageView) view.findViewById(R.id.clearText);
         clearText.setOnClickListener(new View.OnClickListener() {
@@ -56,67 +55,120 @@ public class Search extends Fragment {
                 searchText.getText().clear();
             }
         });
-        searchResultList = (ListView) view.findViewById(R.id.searchResultList);
-        searchResultList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        final ListView searchResultListView = (ListView) view.findViewById(R.id.searchResultList);
+        searchResultListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent showWD = new Intent();
-                showWD.setClass(search_Context, WordDetail.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("Eng", Eng[position]);
-                bundle.putString("Chi", Chi[position]);
-                showWD.putExtras(bundle);
-                startActivity(showWD);
+                Intent showWordDetail = new Intent();
+                showWordDetail.setClass(search_Context, WordDetail.class);
+                selectedWord = searchResultList.get(position);
+                startActivity(showWordDetail);
             }
         });
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {;}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                ;
+            }
+
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {;}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                ;
+            }
+
             @Override
             public void afterTextChanged(Editable s) {
-                searchResult_list.clear();
+                searchResultList.clear();
                 String inputText = searchText.getText().toString();
                 if (!inputText.isEmpty() && inputText.matches("[a-zA-Z]+")) {
-                    char firstChar = inputText.charAt(0);
-                    Cursor cs = ecdict.rawQuery("Select * from list_" + Character.toUpperCase(firstChar), null);
-                    int counterResult = 0, counterTotal = 0;
-                    int dbMount = cs.getCount();
-                    int up = dbMount, down = 0;
-                    cs.moveToFirst();
-                    while (inputText.compareTo(cs.getString(1)) != 0 && (up - down) <= 1) {
-                        cs.moveToPosition((up + down) >> 1);
-                        if (inputText.compareTo(cs.getString(1)) > 0) {
-                            down = (up + down) >> 1;
-                        } else {
-                            up = (up + down) >> 1;
-                        }
-                    }
-                    while (counterResult < 20 && counterTotal < dbMount) {
-                        if (cs.getString(1).startsWith(inputText)) {
-                            Eng[counterResult] = cs.getString(1);
-                            Chi[counterResult] = cs.getString(3);
-                            Word tmp = new Word();
-                            tmp.setEng(cs.getString(1));
-                            tmp.setKK(cs.getString(2));
-                            tmp.setChi(cs.getString(3));
-                            searchResult_list.add(tmp);
-                            counterResult++;
-                        }
-                        cs.moveToNext();
-                        counterTotal++;
-                    }
-                    cs.close();
+                    ecSearch(inputText);
                 } else {
                     //TODO 中文search
 
                 }
-                MyAdapter adapter = new MyAdapter(getActivity(), searchResult_list);
-                searchResultList.setAdapter(adapter);
+                MyAdapter adapter = new MyAdapter(getActivity(), searchResultList);
+                searchResultListView.setAdapter(adapter);
             }
         });
-        //List View -- http://givemepass.blogspot.tw/2011/11/listview.html
+    }
+
+    private void ecSearch_old(String inputText) {
+        char firstChar = inputText.charAt(0);
+        Cursor cs = ecDict.rawQuery("Select * from list_" + Character.toUpperCase(firstChar), null);
+        int counterResult = 0, counterTotal = 0;
+        int dbMount = cs.getCount();
+        int up = dbMount, down = 0;
+        cs.moveToFirst();
+        while (inputText.compareTo(cs.getString(1)) != 0 && (up - down) <= 1) {
+            cs.moveToPosition((up + down) >> 1);
+            if (inputText.compareTo(cs.getString(1)) > 0) {
+                down = (up + down) >> 1;
+            } else {
+                up = (up + down) >> 1;
+            }
+        }
+        while (counterResult < 20 && counterTotal < dbMount) {
+            if (cs.getString(1).startsWith(inputText)) {
+                Word tmp = new Word();
+                tmp.setExample(cs.getString(4));
+                searchResultList.add(tmp);
+                counterResult++;
+            }
+            cs.moveToNext();
+            counterTotal++;
+        }
+        cs.close();
+    }
+
+    private void ecSearch_old2(String inputText) {
+        Cursor cs = ecDict.rawQuery("SELECT * FROM ec WHERE eng LIKE '"
+                + inputText + "%' limit 50", null);
+        cs.moveToFirst();
+        if (cs.getCount() != 0) {
+            int i = 0;
+            while (!cs.isAfterLast() && i < 50) {
+                String tEng = cs.getString(1);
+                String tKK = cs.getString(2);
+                String tChi = cs.getString(3);
+                String tExp = cs.getString(4);
+                Word tmp = new Word();
+                tmp.setExample(tExp); //can be ignore
+                searchResultList.add(tmp);
+                i++;
+                cs.moveToNext();
+            }
+        }
+        cs.close();
+    }
+
+    private void ecSearch(String inputText) {
+        String query = "Select * from ec_" + Character.toLowerCase(inputText.charAt(0)) +
+                " WHERE word LIKE '" + inputText + "%' limit 50";
+        Cursor cs = ecDict.rawQuery(query, null);
+        cs.moveToFirst();
+        if (cs.getCount() != 0) {
+            while (!cs.isAfterLast()) {
+                String word = cs.getString(1);
+                String phonetic = cs.getString(2);
+                String definition = cs.getString(3);
+                String translation = cs.getString(4);
+                String pos = cs.getString(5);
+                String tag = cs.getString(8);
+                String exchange = cs.getString(11);
+                String detail = cs.getString(12);
+                String audio = cs.getString(13);
+                String example = cs.getString(14);
+                int collins = cs.getInt(6);
+                int oxford = cs.getInt(7);
+                int bnc = cs.getInt(9);
+                int frq = cs.getInt(10);
+                Word tmp = new Word(word, phonetic, definition, translation, pos, tag, exchange,
+                        detail, audio, example, collins, oxford, bnc, frq);
+                searchResultList.add(tmp);
+                cs.moveToNext();
+            }
+        }
+
     }
 
 }

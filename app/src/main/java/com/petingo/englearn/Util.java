@@ -60,4 +60,7 @@ class Util {
             e.printStackTrace();
         }
     }
+    static boolean notNullOrEmpty(String n){
+        return !(n == null || n.isEmpty());
+    }
 }

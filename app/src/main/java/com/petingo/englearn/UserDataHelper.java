@@ -25,10 +25,9 @@ class UserDataHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE WordList ("
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-                + "Eng CHAR,"
+                + "Word CHAR,"
                 + "KK CHAR,"
-                + "Chi CHAR,"
-                + "example CHAR,"
+                + "Translation CHAR,"
                 + "listName CHAR"
                 + ")");
 
