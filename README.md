@@ -10,3 +10,8 @@
 -英中/中英<br>
 -首尾打字<br>
 詞性<br>
+
+![img](https://github.com/Petingo/Englearn/blob/master/Screenshot/01.jpg)
+![img](https://github.com/Petingo/Englearn/blob/master/Screenshot/02.jpg)
+![img](https://github.com/Petingo/Englearn/blob/master/Screenshot/03.jpg)
+![img](https://github.com/Petingo/Englearn/blob/master/Screenshot/04.jpg)
